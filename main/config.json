@@ -1,0 +1,8 @@
+{
+  "packages": [
+    {"ecosystem": "PyPI", "name": "django"},
+    {"ecosystem": "npm", "name": "lodash"},
+    {"ecosystem": "PyPI", "name": "certifi"}
+  ],
+  "vulnerability_filter": ["GHSA","PYSEC"]
+}
