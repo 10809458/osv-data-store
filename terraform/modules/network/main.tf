@@ -77,6 +77,26 @@ resource "azurerm_virtual_machine" "osv_data_vm" {
   os_profile_linux_config {
     disable_password_authentication = false
   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y git",
+      "git clone https://github.com/your-username/your-repo.git /home/adminuser/your-repo",
+      "cd /home/adminuser/your-repo",
+      "python3 -m venv venv",
+      "source venv/bin/activate",
+      "pip install -r requirements.txt"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "adminuser"
+      password    = "Password1234!"
+      host        = azurerm_public_ip.osv_data_public_ip.ip_address
+      private_key = file("~/.ssh/id_rsa")
+    }
+  }
 }
 
 output "public_ip" {
