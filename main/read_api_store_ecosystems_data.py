@@ -52,8 +52,6 @@ url = "https://api.osv.dev/v1/query"
 
 headers = {"Content-Type": "application/json"}
 
-# Initialize a dictionary to keep track of vulnerability counts for each filter
-vulnerability_count = {filter: 0 for filter in vulnerability_filters}
 
 # Iterate over the packages
 for package in packages:
@@ -81,7 +79,7 @@ for package in packages:
                 for filter in vulnerability_filters:
                     if filter in vuln_id:  # Check if the entire filter string is in the vuln_id
                         # Increment the count for the corresponding filter
-                        vulnerability_count[filter] += 1
+                        # vulnerability_count[filter] += 1
 
                         # Prepare the data to be saved (package info + vulnerability details)
                         vuln_data = {

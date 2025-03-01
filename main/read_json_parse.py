@@ -5,10 +5,10 @@ import time
 from datetime import datetime, timedelta
 
 # Generate container names based on the current date
-# src_container_name = datetime.now().strftime("%Y%m%d").lower()
-# tgt_container_name = datetime.now().strftime("%Y%m%d").lower()
-src_container_name = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d").lower()
-tgt_container_name = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d").lower()
+src_container_name = datetime.now().strftime("%Y%m%d").lower()
+tgt_container_name = datetime.now().strftime("%Y%m%d").lower()
+# src_container_name = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d").lower()
+# tgt_container_name = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d").lower()
 
 # Azure Storage account details
 src_storage_account_name = "osvdatastorageacct"
