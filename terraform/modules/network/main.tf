@@ -34,6 +34,24 @@ resource "azurerm_public_ip" "osv_data_public_ip" {
   sku                 = "Standard"
 }
 
+resource "azurerm_network_security_group" "osv_data_nsg" {
+  name                = "osv_data_nsg"
+  location            = azurerm_resource_group.osv_data_rg.location
+  resource_group_name = azurerm_resource_group.osv_data_rg.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
 resource "azurerm_network_interface" "osv_data_nic" {
   name                = "osv_data-nic"
   location            = azurerm_resource_group.osv_data_rg.location
@@ -45,6 +63,11 @@ resource "azurerm_network_interface" "osv_data_nic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.osv_data_public_ip.id
   }
+}
+
+resource "azurerm_network_interface_security_group_association" "osv_data_nic_nsg" {
+  network_interface_id      = azurerm_network_interface.osv_data_nic.id
+  network_security_group_id = azurerm_network_security_group.osv_data_nsg.id
 }
 
 resource "azurerm_virtual_machine" "osv_data_vm" {
@@ -71,19 +94,23 @@ resource "azurerm_virtual_machine" "osv_data_vm" {
   os_profile {
     computer_name  = "osvdatamachine"
     admin_username = "adminuser"
-    admin_password = "Password1234!"
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
+
+    ssh_keys {
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = file("~/.ssh/id_rsa.pub")
+    }
   }
 
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
       "sudo apt-get install -y git",
-      "git clone https://github.com/your-username/your-repo.git /home/adminuser/your-repo",
-      "cd /home/adminuser/your-repo",
+      "git clone https://github.com/10809458/osv-data-store /home/adminuser/osv-data-store",
+      "cd /home/adminuser/osv-data-store",
       "python3 -m venv venv",
       "source venv/bin/activate",
       "pip install -r requirements.txt"
@@ -92,9 +119,8 @@ resource "azurerm_virtual_machine" "osv_data_vm" {
     connection {
       type        = "ssh"
       user        = "adminuser"
-      password    = "Password1234!"
-      host        = azurerm_public_ip.osv_data_public_ip.ip_address
       private_key = file("~/.ssh/id_rsa")
+      host        = azurerm_public_ip.osv_data_public_ip.ip_address
     }
   }
 }
